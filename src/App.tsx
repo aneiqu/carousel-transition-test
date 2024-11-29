@@ -1,4 +1,4 @@
-import { createRef, RefObject, useEffect, useState } from "react";
+import { createRef, RefObject, useEffect, useRef, useState } from "react";
 import "./App.css";
 import img0 from "./assets/img0.png";
 import img1 from "./assets/img1.png";
@@ -8,6 +8,9 @@ import img4 from "./assets/img4.png";
 
 function App() {
   const [curActive, setCurActive] = useState<number>(0);
+
+  const touchStartX = useRef(0);
+  const touchEndX = useRef(0);
 
   const Images = [
     { id: 0, img: img0 },
@@ -31,7 +34,7 @@ function App() {
         key={i}
         ref={refs[i]}
         className='z-0 w-full h-full rounded-lg absolute flex justify-between p-4 bg-cover bg-no-repeat bg-center bg-gradient-to-br from-green-500 to-green-900'
-        style={{ marginLeft: i * 50 + "vw", backgroundImage: `url(${Images[i].img})` }}
+        style={{ marginLeft: i * 75 + "vw", backgroundImage: `url(${Images[i].img})` }}
       ></div>
     );
   });
@@ -55,12 +58,33 @@ function App() {
     setCurActive((prev) => prev - 1);
   };
 
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+  const handleTouchMove = (e) => {
+    touchEndX.current = e.touches[0].clientX;
+  };
+  const handleTouchEnd = () => {
+    if (touchEndX.current === 0) return;
+    const final = touchEndX.current - touchStartX.current;
+
+    touchEndX.current = 0;
+    touchStartX.current = 0;
+    if (final > 50) decreaseActive();
+    if (final < -50) increaseActive();
+  };
+
   return (
-    <div className='w-screen h-screen flex items-center justify-center bg-neutral-900'>
-      <div className='w-1/2 h-1/2 rounded-lg relative  bg-cover bg-no-repeat bg-center overflow-hidden'>
+    <div
+      className='w-screen h-screen flex items-center justify-center bg-neutral-900'
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      onTouchMove={handleTouchMove}
+    >
+      <div className='w-3/4 h-3/4 rounded-lg relative  bg-cover bg-no-repeat bg-center overflow-hidden'>
         {elements}
       </div>
-      <div className='w-1/2 h-1/2 z-10 absolute flex justify-between md:p-4'>
+      <div className='w-3/4 h-3/4 z-10 absolute flex justify-between md:p-4'>
         <div className='flex items-center'>
           <div
             className='row-span-2 flex items-center justify-center text-4xl text-white select-none cursor-pointer'
