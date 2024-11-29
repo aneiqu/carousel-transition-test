@@ -1,0 +1,16 @@
+.moveRight {
+  /* margin-left: 50vw; */
+}
+.moveLeft {
+  /* margin-left: -50vw; */
+}
+
+@keyframes test {
+  from {
+    margin-left: 0vw;
+  }
+
+  to {
+    margin-left: 50vw;
+  }
+}
