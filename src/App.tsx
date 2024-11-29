@@ -1,4 +1,4 @@
-import { createRef, useEffect, useState } from "react";
+import { createRef, RefObject, useEffect, useState } from "react";
 import "./App.css";
 import img0 from "./assets/img0.png";
 import img1 from "./assets/img1.png";
@@ -9,10 +9,6 @@ import img4 from "./assets/img4.png";
 function App() {
   const [curActive, setCurActive] = useState<number>(0);
 
-  useEffect(() => {
-    refs[curActive].current.scrollIntoView({ behavior: "smooth" });
-  }, [curActive]);
-
   const Images = [
     { id: 0, img: img0 },
     { id: 1, img: img1 },
@@ -21,17 +17,13 @@ function App() {
     { id: 4, img: img4 },
   ];
 
-  const refs = Images.map(() => createRef());
+  const refs: RefObject<HTMLDivElement>[] = Images.map(() => createRef<HTMLDivElement>());
 
-  const dots = Images.map(({ id }) => (
-    <div
-      key={id}
-      className={`w-4 h-4 rounded-full border-2 border-white cursor-pointer ${
-        id === curActive ? "bg-white" : ""
-      }`}
-      onClick={() => setCurActive(id)}
-    ></div>
-  ));
+  useEffect(() => {
+    if (refs[curActive]?.current) {
+      refs[curActive].current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [curActive]);
 
   const elements = new Array(5).fill("").map((_, i) => {
     return (
@@ -43,6 +35,16 @@ function App() {
       ></div>
     );
   });
+
+  const dots = Images.map(({ id }) => (
+    <div
+      key={id}
+      className={`w-4 h-4 rounded-full border-2 border-white cursor-pointer ${
+        id === curActive ? "bg-white" : ""
+      }`}
+      onClick={() => setCurActive(id)}
+    ></div>
+  ));
 
   const increaseActive = () => {
     if (curActive + 1 > Images.length - 1) return setCurActive(0);
